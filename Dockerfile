@@ -94,6 +94,7 @@ RUN apt-get update -qq \
         gnupg \
         jq \
         qemu-user-static \
+        tini \
     && install -d -m 0755 /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
         | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -132,5 +133,6 @@ EXPOSE 8080
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Run under a tiny init so orphaned node/qemu descendants are reaped.
+ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/docker-entrypoint.sh"]
 CMD ["service"]
