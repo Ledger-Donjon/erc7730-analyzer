@@ -77,8 +77,6 @@ class TestHealth:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
-        assert data["semaphore_locked"] is False
-        assert data["active_jobs"] == 0
 
 
 class TestPostAnalyze:

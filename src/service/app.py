@@ -459,40 +459,9 @@ async def _execute_analysis(
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 async def health():
-    registry = get_registry()
-    semaphore = get_semaphore()
-    active = await registry.active_count()
-    return {
-        "status": "ok",
-        "semaphore_locked": semaphore.locked(),
-        "active_jobs": active,
-    }
-
-
-@app.get("/debug/jobs")
-async def debug_jobs():
-    """List all jobs in the registry with their status."""
-    registry = get_registry()
-    semaphore = get_semaphore()
-    async with registry._lock:
-        jobs = [
-            {
-                "run_key": key,
-                "status": job.status,
-                "status_message": job.status_message,
-                "started_at": job.started_at.isoformat(),
-                "updated_at": job.updated_at.isoformat(),
-                "has_tmp_dir": job.tmp_dir is not None and job.tmp_dir.exists() if job.tmp_dir else False,
-            }
-            for key, job in registry._jobs.items()
-        ]
-    return {
-        "semaphore_locked": semaphore.locked(),
-        "total_jobs": len(jobs),
-        "jobs": jobs,
-    }
+    return HealthResponse()
 
 
 @app.post("/analyze")
